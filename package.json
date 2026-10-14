@@ -1,0 +1,9 @@
+{
+    "name": "crema",
+    "private": true,
+    "workspaces": [
+        "./domain",
+        "./server",
+        "./client"
+    ]
+}

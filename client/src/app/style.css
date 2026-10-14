@@ -1,0 +1,386 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap');
+
+.cr {
+    --espresso: #2A1A12;
+    --roast: #4A2E22;
+    --mocha: #6B4430;
+    --crema: #C9964F;
+    --milk: #F3E9DC;
+    --foam: #FBF6EE;
+    --rust: #A3412C;
+
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--milk);
+    color: var(--espresso);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+.cr * {
+    box-sizing: border-box;
+}
+
+.cr h1,
+.cr h2,
+.cr h3 {
+    font-family: Fraunces, Georgia, serif;
+    margin: 0;
+    line-height: 1.15;
+}
+
+.cr button {
+    font: inherit;
+    cursor: pointer;
+}
+
+.cr :focus-visible {
+    outline: 3px solid var(--crema);
+    outline-offset: 2px;
+}
+
+/* переключатель экранов для просмотра макета */
+.demo {
+    background: #000;
+    color: #ddd;
+    display: flex;
+    gap: 6px;
+    padding: 8px 16px;
+    flex-wrap: wrap;
+    font-size: 13px;
+}
+
+.demo button {
+    background: #222;
+    color: #ddd;
+    border: 0;
+    border-radius: 6px;
+    padding: 4px 10px;
+}
+
+.demo .on {
+    background: var(--crema);
+    color: #000;
+}
+
+/* шапка и контейнер */
+.top {
+    background: var(--espresso);
+    color: var(--milk);
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 32px;
+}
+
+.top b {
+    font-family: Fraunces, serif;
+    font-size: 26px;
+    margin-right: auto;
+}
+
+.top a {
+    color: var(--milk);
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+.wrap {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+}
+
+/* главный блок меню */
+.hero {
+    background: var(--roast);
+    color: var(--milk);
+    padding: 40px 32px 36px;
+}
+
+.hero > div {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: clamp(30px, 5vw, 50px);
+    max-width: 16ch;
+}
+
+.hero p {
+    opacity: 0.8;
+    margin: 12px 0 20px;
+}
+
+.chips {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    border: 1.5px solid var(--crema);
+    color: var(--milk);
+    background: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+}
+
+.chip.on {
+    background: var(--crema);
+    color: var(--espresso);
+    font-weight: 700;
+}
+
+/* вкладки категорий */
+.tabs {
+    display: flex;
+    gap: 28px;
+    border-bottom: 1.5px solid #D9C7AE;
+    margin-bottom: 24px;
+}
+
+.tabs button {
+    background: none;
+    border: 0;
+    padding: 10px 0;
+    color: var(--mocha);
+    font-size: 17px;
+}
+
+.tabs .on {
+    color: var(--espresso);
+    font-weight: 700;
+    border-bottom: 3px solid var(--crema);
+}
+
+/* карточки товаров */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: var(--foam);
+    border-radius: 20px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+    border: 0;
+}
+
+.card.stop {
+    opacity: 0.55;
+}
+
+.disc {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    margin-bottom: 6px;
+}
+
+.price {
+    font-weight: 700;
+    margin-top: auto;
+    padding-top: 8px;
+}
+
+.muted {
+    color: var(--mocha);
+    font-size: 14px;
+}
+
+/* кнопки */
+.btn {
+    background: var(--espresso);
+    color: var(--milk);
+    border: 0;
+    border-radius: 12px;
+    padding: 12px 22px;
+    font-weight: 700;
+}
+
+.btn.gold {
+    background: var(--crema);
+    color: var(--espresso);
+}
+
+.btn.ghost {
+    background: none;
+    color: var(--espresso);
+    border: 1.5px solid var(--espresso);
+}
+
+.btn.sm {
+    padding: 6px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+}
+
+/* модальное окно */
+.veil {
+    position: fixed;
+    inset: 0;
+    background: #2A1A12AA;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+}
+
+.modal {
+    background: var(--foam);
+    border-radius: 24px;
+    padding: 28px;
+    width: min(460px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.opt {
+    display: flex;
+    justify-content: space-between;
+    border: 1.5px solid #D9C7AE;
+    border-radius: 12px;
+    padding: 10px 14px;
+    background: none;
+    width: 100%;
+}
+
+.opt.on {
+    border-color: var(--espresso);
+    background: #EFE0CB;
+}
+
+/* корзина и списки */
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid #DCCBB4;
+}
+
+.panel {
+    background: var(--foam);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.total {
+    font-family: Fraunces, serif;
+    font-size: 26px;
+}
+
+/* статус заказа */
+.steps {
+    display: flex;
+    gap: 0;
+    margin: 28px 0;
+}
+
+.step {
+    flex: 1;
+    text-align: center;
+    color: var(--mocha);
+    position: relative;
+    font-size: 14px;
+}
+
+.step i {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #D9C7AE;
+    margin: 0 auto 8px;
+}
+
+.step.done i {
+    background: var(--crema);
+}
+
+.step.now i {
+    background: var(--espresso);
+    box-shadow: 0 0 0 5px #C9964F66;
+}
+
+.step.now {
+    color: var(--espresso);
+    font-weight: 700;
+}
+
+/* экраны бариста */
+.cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    align-items: start;
+}
+
+.col {
+    background: #E8D8C2;
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tk {
+    background: var(--foam);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tk.late {
+    box-shadow: inset 5px 0 var(--rust);
+}
+
+.meter {
+    height: 10px;
+    border-radius: 5px;
+    background: #E1D0B8;
+    overflow: hidden;
+    min-width: 140px;
+}
+
+.meter span {
+    display: block;
+    height: 100%;
+    background: var(--crema);
+}
+
+.meter.low span {
+    background: var(--rust);
+}
+
+/* вход */
+.login {
+    max-width: 400px;
+    margin: 56px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.login input {
+    font: inherit;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid #D9C7AE;
+    background: var(--foam);
+}
+
+.err {
+    color: var(--rust);
+    font-size: 14px;
+}
