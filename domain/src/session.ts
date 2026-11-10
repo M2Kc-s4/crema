@@ -8,7 +8,6 @@ import { User } from "./user"
 export const ErrInvalidRefreshToken = new DomainError("Недействительный refresh-токен")
 export const ErrStaleRefreshToken =  new DomainError("Refresh-токен устарел")
 
-
 export type RefreshToken = Branded<string, "RefreshToken">
 
 export type AccessToken = Branded<string, "AccessToken">

@@ -7,11 +7,17 @@
     "s": "bun ./src/app/index.html"
   },
   "dependencies": {
-    "domain": "workspace:*",
+    "@elysia/eden": "^1.4.10",
     "bun-plugin-tailwind": "^0.1.2",
+    "clsx": "^2.1.1",
+    "domain": "workspace:*",
+    "fluent-future": "^1.5.3",
+    "lucide-react": "^1.58.0",
     "react": "^19",
     "react-dom": "^19",
-    "tailwindcss": "^4.1.11"
+    "react-router-dom": "^7.18.4",
+    "server": "workspace:*",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@types/react": "^19",

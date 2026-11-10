@@ -11,12 +11,14 @@ export type Ingredient = {
     stock: Quantity
 }
 
-export function Ingredint(name: Name, stock: Quantity): Ingredient {
+export function Ingredient(name: Name, stock: Quantity): Ingredient {
     return { id: ID.generate(), name, stock }
 }
 
-export namespace Ingredint {
+export namespace Ingredient {
     export function consume(ingredient: Mutable<Ingredient>, qty: Quantity) {
+        if (ingredient.stock < qty) throw ErrOutOfStock
+
         ingredient.stock = Quantity(ingredient.stock - qty)
     }
 

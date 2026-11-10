@@ -2,8 +2,16 @@
     "name": "crema",
     "private": true,
     "workspaces": [
-        "./domain",
-        "./server",
-        "./client"
-    ]
+        "domain",
+        "server",
+        "client"
+    ],
+    "scripts": {
+        "ss": "bun --hot ./server/src/index.ts",
+        "sc": "bun --config=./client/bunfig.toml ./client/src/app/index.html"
+    },
+    "dependencies": {
+        "clsx": "^2.1.1",
+        "tailwind-merge": "^3.7.0"
+    }
 }

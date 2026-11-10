@@ -1,7 +1,7 @@
 import { DomainError } from "./error"
 import { ID, Name, Price, Quantity } from "./shared";
 import type { Ingredient } from "./ingridient";
-import { getEntries, type Mutable } from "./lib";
+import { getEntries, getKeys } from "./lib";
 
 
 export const ErrUnknownOption = new DomainError("Опция не найдена в продукте")
@@ -9,10 +9,11 @@ export const ErrUnknownVariant = new DomainError("Вариант не найде
 export const ErrUnknownCategory = new DomainError("Такой категории не существует")
 export const ErrEmptyOption = new DomainError("У опции должен остаться хотя бы один вариант")
 export const ErrEmptyName = new DomainError("Название не может быть пустым")
+export const ErrIncompleteSelection = new DomainError("Выбраны не все опции")
 
 
-const categories = ["coffee", "cold", "pastries"] as const
-export type Category = typeof categories[number]
+export const CATEGORIES = ["coffee", "cold", "pastries"] as const
+export type Category = typeof CATEGORIES[number]
 
 export type IngredientUsage = {
     ingridientId: ID<Ingredient>
@@ -54,7 +55,7 @@ export function Option(name: Name, variants: Variant[]): Option {
 }
 
 export function Category(s: string): Category {
-    if (!categories.includes(s as any)) throw ErrUnknownCategory
+    if (!CATEGORIES.includes(s as any)) throw ErrUnknownCategory
     
     return s as Category
 }
@@ -93,6 +94,8 @@ export namespace Product {
 
 
     export function assertSelectionValid(product: Product, selection: Record<ID<Option>, ID<Variant>>) {
+        if (getKeys(selection).length !== product.options.length) throw ErrIncompleteSelection
+
         getEntries(selection).forEach(([optionId, variantId]) => {
             const option = getOption(product, optionId)
 
@@ -117,11 +120,15 @@ export namespace Product {
         selection: Record<ID<Option>, ID<Variant>>,
         qty: number,
     ) {
-        const usage: Record<ID<Ingredient>, number> = {}
-
-        for (const { variant }  of resolveSelection(product, selection)) {
-            for (const { ingridientId, qty: count } of variant.uses) {
-                usage[ingridientId] = (usage[ingridientId] ?? 0) + (count * qty)
+        const usage: Record<ID<Ingredient>, Quantity> = {}
+        
+        for (const { variant } of resolveSelection(product, selection)) {
+            for (const { ingridientId, qty: ingredientQty } of variant.uses) {
+                console.log((usage[ingridientId] ?? 0) + (ingredientQty * qty))
+                
+                usage[ingridientId] = Quantity(
+                    (usage[ingridientId] ?? 0) + (ingredientQty * qty)
+                )
             }
         }
 

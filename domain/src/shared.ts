@@ -1,5 +1,5 @@
 import { DomainError } from "./error"
-import { randomUUIDv7 } from "bun"
+import { randomUUID } from "crypto"
 import type { Branded } from "./lib"
 
 export const ErrNotFound = new DomainError("Сущность не найдена")
@@ -17,7 +17,7 @@ export function ID<T>(value: string) {
 
 export namespace ID {
     export function generate<T>() {
-        return randomUUIDv7() as ID<T>
+        return randomUUID() as ID<T>
     }
 }
 

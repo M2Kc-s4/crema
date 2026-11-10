@@ -2,6 +2,7 @@ import { DomainError } from "./error";
 import type { Branded, Mutable } from "./lib";
 import type { Option, Product, Variant } from "./product";
 import { ID, Quantity } from "./shared";
+import { Order } from "./order";
 
 
 export const ErrInvalidEmail = new DomainError("Невалидный формат почты")
@@ -11,14 +12,17 @@ export const ErrCartIsEmpty = new DomainError("Корзина пуста")
 export const ErrForbidden = new DomainError("У вас нет прав на это действие")
 export const ErrUnknownRole = new DomainError("Такой роли не существует")
 export const ErrAuthFailed = new DomainError("Ошибка авторизации")
+export const ErrEmailExists = new DomainError("Пользователь с таким email уже зарегистрирован")
 
 
 export type PlainPassword = Branded<string, "PlainPassword">
 
 export type HashedPassword = Branded<string, "HashedPassword">
+export const PASSWORD_HASH_PLACEHOLDER = "PRIVATE" as HashedPassword
 
-const roles = ['customer', 'barman'] as const
-export type UserRole = typeof roles[number]
+
+export const USER_ROLES = ['customer', 'barman'] as const
+export type UserRole = typeof USER_ROLES[number]
 
 export type Email = Branded<string, "Email">
 
@@ -51,7 +55,7 @@ export function PlainPassword(plain: string) {
 }
 
 export function UserRole(string: string) {
-    if (!roles.includes(string as any)) throw ErrUnknownRole
+    if (!USER_ROLES.includes(string as any)) throw ErrUnknownRole
 
     return string as UserRole
 }
@@ -61,7 +65,7 @@ export function CartItem(productId: ID<Product>, qty: Quantity, options: Record<
 }
 
 export function User(email: Email, hashedPassword: HashedPassword, role: UserRole): User {
-    return { id: ID.generate(), email, hashedPassword, role, cart: []}
+    return { id: ID.generate(), email, hashedPassword, role, cart: [] }
 }
 
 
@@ -84,7 +88,6 @@ export namespace User {
     export function clearCart(user: Mutable<User>) {
         user.cart = []
     }
-
 
 
     export function assertCartNotEmpty(user: User) {
