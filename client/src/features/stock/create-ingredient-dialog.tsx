@@ -24,12 +24,8 @@ export function CreateIngredientDialog({ onClose }: CreateIngredientDialogProps)
     const { mutate: createIngredient } = useMutation({
         mutation: stockApi.createIngredient,
         refetches: 'stock',
-        onSuccess() {
-            onClose()
-        },
-        onError(error) {
-            setError(error.message)
-        }
+        onSuccess: onClose,
+        onError: setError
     })
 
 

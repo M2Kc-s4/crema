@@ -180,7 +180,7 @@ export function createForm<T extends FormValues>(defaultValues: T): CreateFormRe
             watch,
             setValue,
             formError: error,
-            setError,
+            setError: e => setError(e?.message),
             FormProvider,
             useFieldArray,
         }

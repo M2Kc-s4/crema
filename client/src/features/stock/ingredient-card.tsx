@@ -10,7 +10,6 @@ type IngredientCardProps = {
 export function IngredientCard({ ingredient }: IngredientCardProps) {
     const [dialogOpen, setDialogOpen] = useState(false)
 
-
     const onClose = () => setDialogOpen(false)
     const onOpen = () => setDialogOpen(true)
     

@@ -15,7 +15,7 @@ type Cmd = {
             priceDelta: number
             uses: {
                 ingredientId: string
-                amount: number
+                qty: number
             }[]
         }[]
     }[]
@@ -44,7 +44,7 @@ export async function createProductUseCase(cmd: Cmd, txm: ITransactionManager) {
                             v.uses.map(u => 
                                 IngredientUsage(
                                     ID(u.ingredientId), 
-                                    Quantity(u.amount)
+                                    Quantity(u.qty)
                                 )
                             )
                         )

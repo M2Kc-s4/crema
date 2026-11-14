@@ -123,9 +123,7 @@ export namespace Product {
         const usage: Record<ID<Ingredient>, Quantity> = {}
         
         for (const { variant } of resolveSelection(product, selection)) {
-            for (const { ingridientId, qty: ingredientQty } of variant.uses) {
-                console.log((usage[ingridientId] ?? 0) + (ingredientQty * qty))
-                
+            for (const { ingridientId, qty: ingredientQty } of variant.uses) {                
                 usage[ingridientId] = Quantity(
                     (usage[ingridientId] ?? 0) + (ingredientQty * qty)
                 )

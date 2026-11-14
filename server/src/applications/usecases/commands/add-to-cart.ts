@@ -36,8 +36,8 @@ export function addToCartUseCase(cmd: Command, txm: ITransactionManager) {
         Product.assertSelectionValid(product, options)
 
         User.addToCart(
-            user, 
-            CartItem(product.id, qty, options)
+            user, product, 
+            qty, options
         )
 
         await uow.user.save(user)

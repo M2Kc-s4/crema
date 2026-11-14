@@ -28,9 +28,7 @@ export function LoginPage() {
             api.setAccess(access)
             updateCurrentUser()
         },
-        onError(error) {
-            setError(error.message)
-        }
+        onError: setError
     })
 
     const onSubmit = handleSubmit(login)

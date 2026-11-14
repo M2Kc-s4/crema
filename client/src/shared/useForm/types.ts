@@ -79,6 +79,28 @@ export type ArrayPathValue<
 
 export type Path<T extends FormValues> = PathToArrays<T> | PathToFields<T> | PathToRecords<T>
 
+type IsMatch<Value, Target> =
+    [Value] extends [Target]
+        ? [Target] extends [Value]
+            ? true
+            : false
+        : false
+
+
+export type PathTo<T extends FormValues, Target> =
+    (IsMatch<T, Target> extends true ? "" : never) | PathToNested<T, Target>
+
+type PathToNested<T extends FormValues, Target> = {
+    [K in keyof T & string]:
+        (IsMatch<T[K], Target> extends true ? K : never)
+        | (T[K] extends readonly (infer Item extends FormValues)[]
+            ?   | (IsMatch<Item, Target> extends true ? `${K}.${number}` : never)
+                | `${K}.${number}.${PathToNested<Item, Target>}`
+            : T[K] extends FormValues
+                ? `${K}.${PathToNested<T[K], Target>}`
+                : never)
+}[keyof T & string]
+
 
 export type FormInput = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
 export type FormEvent = ChangeEvent<FormInput>

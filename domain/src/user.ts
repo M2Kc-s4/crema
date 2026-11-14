@@ -2,7 +2,6 @@ import { DomainError } from "./error";
 import type { Branded, Mutable } from "./lib";
 import type { Option, Product, Variant } from "./product";
 import { ID, Quantity } from "./shared";
-import { Order } from "./order";
 
 
 export const ErrInvalidEmail = new DomainError("Невалидный формат почты")
@@ -27,6 +26,7 @@ export type UserRole = typeof USER_ROLES[number]
 export type Email = Branded<string, "Email">
 
 export type CartItem = {
+    id: ID<CartItem>
     productId: ID<Product>
     qty: Quantity
     options: Record<ID<Option>, ID<Variant>>
@@ -60,8 +60,9 @@ export function UserRole(string: string) {
     return string as UserRole
 }
 
-export function CartItem(productId: ID<Product>, qty: Quantity, options: Record<ID<Option>, ID<Variant>>): CartItem {
-    return { productId, qty, options }
+
+export function CartItem(product: Product, qty: Quantity, options: Record<ID<Option>, ID<Variant>>): CartItem {
+    return { productId: product.id, qty, options, id: ID.generate() }
 }
 
 export function User(email: Email, hashedPassword: HashedPassword, role: UserRole): User {
@@ -70,19 +71,32 @@ export function User(email: Email, hashedPassword: HashedPassword, role: UserRol
 
 
 
-
 export namespace User {
-    export function addToCart(user: Mutable<User>, cartItem: CartItem) {
-        const newKey = getCartItemKey(cartItem)
+    export function addToCart(user: Mutable<User>, product: Product, qty: Quantity, options: Record<ID<Option>, ID<Variant>>) {
+        const newKey = getCartItemKey(product.id, options)
 
-        const existing = user.cart.find(item => getCartItemKey(item) === newKey)
+        const existing = user.cart.find(i => getCartItemKey(i.productId, i.options) === newKey)
 
         if (existing) {
-            existing.qty = Quantity(existing.qty + cartItem.qty)
+            existing.qty = Quantity(existing.qty + qty)
         }
         else {
+            const cartItem = CartItem(product, qty, options)
+
             user.cart.push(cartItem)
         }
+    }
+
+    export function removeFromCart(user: Mutable<User>, cartItemId: ID<CartItem>) {
+        const cartItem = user.cart.find(i => i.id === cartItemId)
+    
+        if (!cartItem) return
+
+        if (cartItem.qty === 1) {
+            user.cart = user.cart.filter(i => i !== cartItem)
+        }
+
+        cartItem.qty = Quantity(cartItem.qty - 1)
     }
 
     export function clearCart(user: Mutable<User>) {
@@ -94,13 +108,13 @@ export namespace User {
         if (user.cart.length === 0) throw ErrCartIsEmpty
     }
 
-    export function getCartItemKey(item: CartItem): string {
-        const opts = Object.entries(item.options)
+    export function getCartItemKey(productId: ID<Product>, options: Record<ID<Option>, ID<Variant>>): string {
+        const opts = Object.entries(options)
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([k, v]) => `${k}=${v}`)
             .join("&")
 
-        return `${item.productId}?${opts}`
+        return `${productId}?${opts}`
     }
 
     export function isCustomer(user: User) {

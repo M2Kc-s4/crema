@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@/shared/useQuery"
 import { cartApi } from "./api"
-import { User } from "domain/user"
+import { CartItem, User } from "domain/user"
 import { Product } from "domain/product"
 import { CartItemCard } from "./cart-item"
 import { ErrorFeedback, LoadingFeedback } from "@/shared/ui/feedback"
@@ -11,17 +11,21 @@ export function CartPage() {
     const { updateCurrentUser } = useCurrentUser()
 
     const { data: cart, error } = useQuery({
-        query: cartApi.getCart
+        query: cartApi.getCart,
+        tags: 'cart'
     })
 
-    const { mutate: placeOrder } = useMutation({
+    const { mutate: placeOrder, isPending: isPlacing } = useMutation({
         mutation: cartApi.placeOrder,
-        onSuccess() {
-            updateCurrentUser()
-        },
+        onSuccess: updateCurrentUser,
         onError(error) {
             alert(error.message)
         },
+    })
+
+    const { mutate: removeFromCard } = useMutation({
+        mutation: cartApi.removeFromCard,
+        refetches: "cart"
     })
 
     if (error) return <ErrorFeedback message={error.message} />
@@ -31,6 +35,7 @@ export function CartPage() {
     const sum = cart.reduce((prev, [cartItem, product]) => 
         prev + Product.calculateTotalPrice(product, cartItem.options), 0
     )
+    const onItemRemove = (item: CartItem) => () => removeFromCard({cartItemId: item.id})
 
 
     return (
@@ -39,13 +44,18 @@ export function CartPage() {
             
             <Section>
                 {cart.map(([item, product]) => 
-                    <CartItemCard cartItem={item} product={product} key={User.getCartItemKey(item)}/>
+                    <CartItemCard 
+                        cartItem={item} 
+                        product={product} 
+                        key={User.getCartItemKey(item.productId, item.options)}
+                        onRemove={onItemRemove(item)}
+                    />
                 )}
                 <Section dark>
                     <Row>
                         <Text bold>Итого {sum} ₽</Text>
                         <Spacer />
-                        <Button onClick={placeOrder} gold >Оформить заказ</Button>
+                        <Button onClick={placeOrder} loading={isPlacing} gold >Оформить заказ</Button>
                     </Row>
                 </Section>
             </Section>

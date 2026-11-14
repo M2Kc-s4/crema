@@ -110,7 +110,7 @@ type QueryState<T, E> = {
 
 
 export function useQuery<T, E = unknown>({
-	query, enabled = true, tags = EMPTY_TAGS, deps = EMPTY_DEPS, key, staleTime = 0,
+	query, enabled = true, tags = EMPTY_TAGS, deps = EMPTY_DEPS, key, staleTime = 0
 }: UseQueryOptions<T, E>) {
 	const registry = useQueryRegistry()
 

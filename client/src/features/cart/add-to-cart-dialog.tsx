@@ -34,12 +34,8 @@ export function AddToCartDialog({ onClose, product }: AddToCartDialogProps) {
 
     const { mutate: addToCart } = useMutation({
         mutation: cartApi.addToCart,
-        onSuccess() {
-            updateCurrentUser()
-        },
-        onError(error) {
-            setError(error.message)
-        },
+        onSuccess: updateCurrentUser,
+        onError: setError,
     })
 
 

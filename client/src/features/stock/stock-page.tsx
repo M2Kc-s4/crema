@@ -5,11 +5,11 @@ import { ErrorFeedback, LoadingFeedback } from "@/shared/ui/feedback";
 import { CreateIngredientDialog } from "./create-ingredient-dialog";
 import { IngredientCard } from "./ingredient-card";
 import { ProductCard } from "./product-card";
-import { Button, Grid, Page, Section, Text } from "@/shared/ui/layout";
+import { Button, Grid, Page, Row, Section, Text } from "@/shared/ui/layout";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/app/routes";
 
-export function StockPage() {
+function useVM() {
     const [createIngredientDialogOpen, setCreateIngredientDialogOpen] = useState(false)
     const navigate = useNavigate()
 
@@ -18,16 +18,30 @@ export function StockPage() {
         tags: "stock",
     })
 
-    if (error) return <ErrorFeedback message={error.message} />
-    if (!stock) return <LoadingFeedback />
+    return {
+        onNewProduct: () => navigate(ROUTES.createProduct),
+        onIngredientDialogOpen: () => setCreateIngredientDialogOpen(true),
+        onIngredientDialogClose: () => setCreateIngredientDialogOpen(false),
+        stock,
+        error,
+        createIngredientDialogOpen
+    }
+}
 
-    const { ingredients, products } = stock
-    const onNewProduct = () => navigate(ROUTES.createProduct)
+
+export function StockPage() {
+    const vm = useVM()
+
+    if (!vm.stock) return vm.error
+        ?   <ErrorFeedback message={vm.error.message} />
+        :   <LoadingFeedback />
+
+    const { ingredients, products } = vm.stock
 
     return (
         <Page>
-            {createIngredientDialogOpen &&
-                <CreateIngredientDialog onClose={() => setCreateIngredientDialogOpen(false)} />
+            {vm.createIngredientDialogOpen &&
+                <CreateIngredientDialog onClose={vm.onIngredientDialogClose} />
             }
 
             <Text xl>Меню и остатки</Text>
@@ -40,7 +54,7 @@ export function StockPage() {
                         <IngredientCard ingredient={i} key={i.id} />
                     )}
 
-                    <Button gold onClick={() => setCreateIngredientDialogOpen(true)}>
+                    <Button gold onClick={vm.onIngredientDialogOpen}>
                         Добавить ингредиент
                     </Button>
                 </Section>
@@ -52,7 +66,7 @@ export function StockPage() {
                         <ProductCard product={p} key={p.id} />
                     )}
                     
-                    <Button ghost onClick={onNewProduct}>
+                    <Button ghost onClick={vm.onNewProduct}>
                         Новая позиция
                     </Button>
                 </Section>

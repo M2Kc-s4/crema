@@ -37,7 +37,7 @@ const CreateProductRequest = t.Object({
                     uses: t.Array(
                         t.Object({
                             ingredientId: t.String(),
-                            amount: t.Numeric(),
+                            qty: t.Numeric(),
                         })
                     ),
                 })

@@ -9,7 +9,7 @@ import { TrackPage } from "@/features/track/track-page";
 import { CartPage } from "@/features/cart/cart-page";
 import { StockPage } from "@/features/stock/stock-page";
 import { GuestGuard } from "./guards/guest-guard";
-import { CreateProductPage } from "@/features/stock/create-product-page";
+import { CreateProductPage } from "@/features/create-product/create-product-page";
 
 export function Router() {
     return (

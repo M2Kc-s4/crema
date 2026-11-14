@@ -2,17 +2,12 @@ import Elysia, { t, type Static } from "elysia";
 import { authMacro } from "./shared";
 import { getCartUseCase } from "@/applications/usecases/queries/get-cart";
 import { reader, txm } from "@/composition";
-import { addToCartUseCase } from "@/applications/usecases/commands/add-to-card";
+import { addToCartUseCase } from "@/applications/usecases/commands/add-to-cart";
 import { placeOrderUseCase } from "@/applications/usecases/commands/place-order";
+import { removeFromCardUseCase } from "@/applications/usecases/commands/remove-from-cart";
 
 export const cartRoutes = new Elysia().use(authMacro)
 
-cartRoutes.get('/cart', 
-    ({ userId }) => getCartUseCase({ userId }, reader), 
-    {
-        auth: true
-    }
-)
 
 
 const AddToCartRequest = t.Object({
@@ -23,7 +18,22 @@ const AddToCartRequest = t.Object({
 
 export type AddToCartRequest = Static<typeof AddToCartRequest>
 
-cartRoutes.post('/me/add-to-cart',
+
+const RemoveFromCardRequest = t.Object({
+    cartItemId: t.String()
+})
+
+export type RemoveFromCardRequest = Static<typeof RemoveFromCardRequest>
+
+
+cartRoutes.get('/me/cart', 
+    ({ userId }) => getCartUseCase({ userId }, reader), 
+    {
+        auth: true
+    }
+)
+
+cartRoutes.post('/me/cart/add',
     ({ body, userId }) => addToCartUseCase({ ...body, userId }, txm),
     {
         auth: true,
@@ -31,8 +41,12 @@ cartRoutes.post('/me/add-to-cart',
     }
 )
 
-
-cartRoutes.post('/me/place-order', 
+cartRoutes.post('/me/cart/place', 
     ({ userId }) => placeOrderUseCase({ userId }, txm),
     { auth: true }
+)
+
+cartRoutes.post('/me/cart/remove', 
+    ({ userId, body }) => removeFromCardUseCase({ userId, ...body }, txm),
+    { auth: true, body: RemoveFromCardRequest }
 )

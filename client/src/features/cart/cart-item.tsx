@@ -4,11 +4,12 @@ import type { CartItem } from "domain/user";
 
 type CartItemCardProps = {
     cartItem: CartItem
-    product: Product
+    product: Product,
+    onRemove: () => void
 }
 
-export function CartItemCard({ cartItem, product }: CartItemCardProps) {
-    const opts = Product.resolveSelection(product, cartItem.options)
+export function CartItemCard({ cartItem, onRemove, product }: CartItemCardProps) {
+    const opts = Product.resolveSelection(product, cartItem.options) 
 
     return (
         <Row line>
@@ -17,7 +18,7 @@ export function CartItemCard({ cartItem, product }: CartItemCardProps) {
                 <Text muted >{opts.map(o => o.variant.name).join(', ') || "Без добавок"}</Text>
             </Box>
             <Text>{cartItem.qty} × {product.price} ₽</Text>
-            <Button sm >Убрать</Button>
+            <Button onClick={onRemove} sm >Убрать</Button>
         </Row>
     )
 }

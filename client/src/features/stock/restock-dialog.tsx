@@ -13,27 +13,31 @@ type RestockDraft = {
     qty: number
 }
 
-const emptyRestock: RestockDraft = {
-    qty: NaN
-}
+const { useForm } = createForm<RestockDraft>({ qty: NaN })
 
-const { useForm } = createForm(emptyRestock)
-
-export function RestockDialog({ ingredient, onClose }: RestockDialogProps) {
-    const { register, setError, handleSubmit, formError: error } = useForm()
+function useVM(ingredient: Ingredient, onClose: () => void) {
+    const { register, setError, handleSubmit, formError } = useForm()
 
     const { mutate: restock, isPending: loading } = useMutation({
         mutation: stockApi.restockIngredient,
         refetches: "stock",
-        onSuccess() {
-            onClose()
-        },
-        onError(error) {
-            setError(error.message)
-        }
+        onSuccess: onClose,
+        onError: setError
     })
 
     const onSubmit = handleSubmit(data => restock({...data, ingredientId: ingredient.id}))
+
+    return {
+        onSubmit, 
+        register,
+        loading,
+        formError
+    }
+}
+
+
+export function RestockDialog({ ingredient, onClose }: RestockDialogProps) {
+    const { register, onSubmit, loading, formError } = useVM(ingredient, onClose)
 
     return (
         <Modal title={`Записать поставку ингридиента ${ingredient.name}`} onClose={onClose} wide>
@@ -42,7 +46,7 @@ export function RestockDialog({ ingredient, onClose }: RestockDialogProps) {
                     <Input {...register('qty')} placeholder="кол-во" type="number" required />
                 </FormField>
 
-                <FormError error={error} />
+                <FormError error={formError} />
 
                 <FormActions>
                     <Button ghost onClick={onClose}>Отмена</Button>
