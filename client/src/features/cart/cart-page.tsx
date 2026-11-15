@@ -25,6 +25,7 @@ export function CartPage() {
 
     const { mutate: removeFromCard } = useMutation({
         mutation: cartApi.removeFromCard,
+        onSuccess: updateCurrentUser,
         refetches: "cart"
     })
 
@@ -33,7 +34,7 @@ export function CartPage() {
 
 
     const sum = cart.reduce((prev, [cartItem, product]) => 
-        prev + Product.calculateTotalPrice(product, cartItem.options), 0
+        prev + Product.calculateTotalPrice(product, cartItem.options) * cartItem.qty, 0
     )
     const onItemRemove = (item: CartItem) => () => removeFromCard({cartItemId: item.id})
 
@@ -49,6 +50,7 @@ export function CartPage() {
                         product={product} 
                         key={User.getCartItemKey(item.productId, item.options)}
                         onRemove={onItemRemove(item)}
+                        options={item.options}
                     />
                 )}
                 <Section dark>

@@ -34,7 +34,7 @@ export function addToCartUseCase(cmd: Command, txm: ITransactionManager) {
         if (!product) throw ErrNotFound
         
         Product.assertSelectionValid(product, options)
-
+        
         User.addToCart(
             user, product, 
             qty, options
