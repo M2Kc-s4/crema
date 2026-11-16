@@ -27,8 +27,6 @@ export function addToCartUseCase(cmd: Command, txm: ITransactionManager) {
 
         if (!user) throw ErrNotFound
 
-        // if (!User.isCustomer(user)) throw ErrBarmanCart
-
         const product = await uow.product.getByID(productId)
 
         if (!product) throw ErrNotFound

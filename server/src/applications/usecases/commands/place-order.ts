@@ -22,7 +22,7 @@ export function placeOrderUseCase(cmd: Command, txm: ITransactionManager) {
 
         const orderExists = await uow.order.hasOpenedByUser(user)
 
-        if (orderExists) throw ErrParallelOrders
+        Order.assertCanPlaceOrder(orderExists)
 
         const orderItems: OrderItem[] = []
 

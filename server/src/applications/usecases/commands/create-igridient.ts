@@ -16,7 +16,7 @@ export function createIngredientUseCase(cmd: Command, txm: ITransactionManager) 
         const user = await uow.user.getByID(userId)
         if (!user) throw ErrNotFound
 
-        if (!User.isBarman(user)) throw ErrForbidden
+        User.assertIsBarman(user)
 
         const ingredient = await uow.ingredient.create(
             Ingredient(name, Quantity(0))

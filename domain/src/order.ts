@@ -71,7 +71,7 @@ export function Order(user: User, items: OrderItem[]): Order {
 
 export namespace Order {
     export function issue(order: Mutable<Order>) {
-        if (order.status === "issued") throw ErrAlreadyIssued
+        if (Order.isIssued(order)) throw ErrAlreadyIssued
 
         order.status = "issued"
     }
@@ -79,7 +79,7 @@ export namespace Order {
     export function pickUp(order: Mutable<Order>) {
         if (order.status === 'progress') throw ErrOrderNotIssued
 
-        if (order.status === 'pickedUp') throw ErrOrderAlreadyPickedUp
+        if (Order.isPickedUp(order)) throw ErrOrderAlreadyPickedUp
 
         order.status = 'pickedUp'
     }
@@ -95,6 +95,10 @@ export namespace Order {
 
     export function isPickedUp(order: Order) {
         return order.status === 'pickedUp'
+    }
+
+    export function assertCanPlaceOrder(orderExists: boolean) {
+        if (orderExists) throw ErrParallelOrders
     }
 
     export function optionsLabel(item: OrderItem, product: Product): string {

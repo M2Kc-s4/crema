@@ -14,8 +14,9 @@ export function registerUseCase(cmd: Command, txm: ITransactionManager, hasher: 
     const role  = UserRole(cmd.role)
 
     return txm.begin(async uow => {
-        const exists = await uow.user.existsByEmail(email)
-        if (exists) throw ErrEmailExists
+        const emailExists = await uow.user.existsByEmail(email)
+
+        User.assertEmailFree(emailExists)
 
         const hashed = await hasher.hash(password)
 

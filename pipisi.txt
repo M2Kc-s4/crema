@@ -1,1 +1,0 @@
-wrk -t2 -c100 -d30s -H 'Authorization: Bearer eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIwNzA3ZmU2Mi01MmI1LTQ2YTYtOTIyMS1iZTgyMmIwMTZhYjMiLCJleHAiOjE3OTQ4NDk3ODYsImlhdCI6MTc5NDc2MzM4Nn0.yCDRYoqEhpXK1a4OTePzaIB2cWNrxuzDlmOyHZdE9AMMWxKkAPwWfrQc7qFe3oIuTR92PLISWd2SziMgcFlzLQ' -H 'accept: application/json' http://192.168.208.1:8000/me/cart/remove

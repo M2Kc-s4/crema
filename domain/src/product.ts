@@ -51,6 +51,8 @@ export function Variant(name: Name, priceDelta: number, uses: IngredientUsage[])
 }
 
 export function Option(name: Name, variants: Variant[]): Option {
+    if (variants.length < 1) throw ErrEmptyOption
+    
     return { id: ID.generate(), name, variants }
 }
 

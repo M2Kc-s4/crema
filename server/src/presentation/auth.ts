@@ -81,7 +81,7 @@ authRoutes.post('/refresh',
 
 .post('/logout', 
     async ({
-        cookie: { sessionToken }
+        cookie: { sessionRefresh: sessionToken }
     }) => {
         if (!sessionToken.value) throw ErrUnauthorized
 
@@ -92,7 +92,7 @@ authRoutes.post('/refresh',
         }
     }, {
         cookie: t.Object({
-            sessionToken: t.Optional(t.String())
+            sessionRefresh: t.Optional(t.String())
         }),
     }
 )

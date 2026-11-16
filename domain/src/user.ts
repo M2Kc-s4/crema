@@ -73,6 +73,8 @@ export function User(email: Email, hashedPassword: HashedPassword, role: UserRol
 
 export namespace User {
     export function addToCart(user: Mutable<User>, product: Product, qty: Quantity, options: Record<ID<Option>, ID<Variant>>) {
+        User.assertIsCustomer(user)
+
         const newKey = getCartItemKey(product.id, options)
 
         const existing = user.cart.find(i => getCartItemKey(i.productId, i.options) === newKey)
@@ -88,18 +90,24 @@ export namespace User {
     }
 
     export function removeFromCart(user: Mutable<User>, cartItemId: ID<CartItem>) {
+        User.assertIsCustomer(user)
+
         const cartItem = user.cart.find(i => i.id === cartItemId)
     
         if (!cartItem) return
 
         if (cartItem.qty === 1) {
             user.cart = user.cart.filter(i => i !== cartItem)
+
+            return
         }
 
         cartItem.qty = Quantity(cartItem.qty - 1)
     }
 
     export function clearCart(user: Mutable<User>) {
+        User.assertIsCustomer(user)
+
         user.cart = []
     }
 
@@ -107,6 +115,19 @@ export namespace User {
     export function assertCartNotEmpty(user: User) {
         if (user.cart.length === 0) throw ErrCartIsEmpty
     }
+
+    export function assertIsBarman(user: User) {
+        if (!User.isBarman(user)) throw ErrForbidden
+    }
+
+    export function assertIsCustomer(user: User) {
+        if (!User.isCustomer(user)) throw ErrForbidden
+    }
+
+    export function assertEmailFree(emailExists: boolean) {
+        if (emailExists) throw ErrEmailExists
+    }
+
 
     export function getCartItemKey(productId: ID<Product>, options: Record<ID<Option>, ID<Variant>>): string {
         const opts = Object.entries(options)

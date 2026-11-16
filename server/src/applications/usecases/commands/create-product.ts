@@ -28,7 +28,7 @@ export async function createProductUseCase(cmd: Cmd, txm: ITransactionManager) {
         const user = await uow.user.getByID(userId)
         if (!user) throw ErrNotFound
 
-        if (!User.isBarman(user)) throw ErrForbidden
+        User.assertIsBarman(user)
 
         const product = Product(
             Name(cmd.name), 

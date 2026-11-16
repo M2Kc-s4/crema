@@ -17,7 +17,7 @@ export function issueOrderUseCase(cmd: Command, txm: ITransactionManager) {
 
         if (!user) throw ErrNotFound
 
-        if (!User.isBarman(user)) throw ErrForbidden
+        User.assertIsBarman(user)
 
         const order = await uow.order.getByIDForUpdate(orderId)
 
