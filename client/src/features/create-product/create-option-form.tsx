@@ -1,24 +1,9 @@
-import type { PathTo } from "@/shared/useForm/types"
-import { emptyVariant, useCreateProductFormContext, type OptionDraft, type ProductDraft } from "./form-data"
+import type { PathTo } from "@/shared/lib/useForm/types"
 import { Button, Column, Row, Section, Text } from "@/shared/ui/layout"
 import { Input } from "@/shared/ui/form"
 import { CreateVariantForm } from "./create-variant-form"
-
-function useOptionFormVM(path: PathTo<ProductDraft, OptionDraft>) {
-    const { useFieldArray, register } = useCreateProductFormContext(path)
-
-    const {
-        fields: variants,
-        append: addVariant,
-        remove: removeVariant
-    } = useFieldArray('variants')
-
-    return {
-        register, variants,
-        onVariantAdd: () => addVariant(emptyVariant),
-        onVariantRemove: (i: number) => () => removeVariant(i)
-    }
-}
+import { emptyVariant, type OptionDraft, type ProductDraft } from "./form-data"
+import { useFormContext } from "@/shared/lib/useForm/useForm"
 
 
 type OptionFormProps = {
@@ -28,7 +13,18 @@ type OptionFormProps = {
 }
 
 export function CreateOptionForm({ index, path, onOptionRemove }: OptionFormProps) {
-    const { register, onVariantAdd, onVariantRemove, variants } = useOptionFormVM(path)
+    const { useFieldArray, register } = useFormContext<ProductDraft>().scope(path)
+
+    const {
+        fields: variants,
+        append: addVariant,
+        remove: removeVariant
+    } = useFieldArray('variants')
+
+
+    const onVariantAdd = () => addVariant(emptyVariant)
+    const onVariantRemove = (i: number) => () => removeVariant(i)
+
 
     return (
         <Section dark>

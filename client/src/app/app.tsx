@@ -1,6 +1,6 @@
 import './style.css'
 import { type PropsWithChildren } from "react"
-import { QueryRegistryProvider } from '@/shared/useQuery'
+import { QueryRegistryProvider } from '@/shared/lib/useQuery'
 import CurrentUserProvider from './providers/current-user-provider'
 import { LoadingProvider, useLoading } from './providers/loading-provider'
 import { BrowserRouter, useLoaderData } from 'react-router-dom'

@@ -1,10 +1,12 @@
-import { useMutation } from "@/shared/useQuery"
+import { useMutation } from "@/shared/lib/useQuery"
 import { api } from "@/shared/api"
 import { useCurrentUser } from "@/app/providers/current-user-provider"
 import { authApi } from "./api"
 import { Form, FormError, Input } from "@/shared/ui/form"
 import { Button, Container, Page, Section, Text } from "@/shared/ui/layout"
-import { createForm } from "@/shared/useForm"
+import { useNavigate } from "react-router-dom"
+import { ROUTES } from "@/app/routes"
+import { useForm } from "@/shared/lib/useForm/useForm"
 
 type LoginDraft = {
     email: string
@@ -16,14 +18,13 @@ const emptyLogin: LoginDraft = {
     password: ''
 }
 
-const { useForm } = createForm(emptyLogin)
 
 export function LoginPage() {
-    const { register, formError: error, handleSubmit, setError } = useForm()
+    const navigate = useNavigate()
+    const { register, formError, handleSubmit, setError } = useForm(emptyLogin)
     const { updateCurrentUser } = useCurrentUser()
 
-    const { mutate: login, isPending } = useMutation({
-        mutation: authApi.login,
+    const { mutate: login, isPending } = useMutation(authApi.login, {
         onSuccess(access) {
             api.setAccess(access)
             updateCurrentUser()
@@ -44,10 +45,10 @@ export function LoginPage() {
                         <Input {...register('email')} placeholder="Электронная почта" required />
                         <Input {...register('password')} placeholder="Пароль" type="password" required />
                         
-                        <FormError error={error} />
+                        <FormError error={formError} />
                         
                         <Button loading={isPending} submit >"Войти"</Button>
-                        <Button ghost >Создать аккаунт</Button>
+                        <Button ghost onClick={() => navigate(ROUTES.register)} >Создать аккаунт</Button>
                     </Form>
                 </Section>
             </Container>

@@ -8,7 +8,8 @@
     ],
     "scripts": {
         "ss": "bun --hot ./server/src/index.ts",
-        "sc": "bun --config=./client/bunfig.toml ./client/src/app/index.html"
+        "sc": "bun --config=./client/bunfig.toml ./client/src/app/index.html",
+        "bc": "bun ./client/build.ts"
     },
     "dependencies": {
         "clsx": "^2.1.1",

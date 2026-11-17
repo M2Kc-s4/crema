@@ -1,24 +1,11 @@
-import type { PathTo } from "@/shared/useForm/types"
-import { useCreateProductFormContext, type ProductDraft, type UsageDraft } from "./form-data"
-import { useQuery } from "@/shared/useQuery"
+import type { PathTo } from "@/shared/lib/useForm/types"
+import { useQuery } from "@/shared/lib/useQuery"
 import { stockApi } from "../stock/api"
 import { ErrorFeedback, LoadingFeedback } from "@/shared/ui/feedback"
 import { Button, Row } from "@/shared/ui/layout"
 import { FormField, Input, Select } from "@/shared/ui/form"
-
-function useUsageFormVM(path: PathTo<ProductDraft, UsageDraft>) {
-    const { register } = useCreateProductFormContext(path)
-
-    const { data: ingredients, error } = useQuery({
-        query: stockApi.getIngredients,
-        key: 'ingredients',
-        staleTime: Infinity
-    })
-
-    return {
-        ingredients, error, register
-    }
-}
+import type { ProductDraft, UsageDraft } from "./form-data"
+import { useFormContext } from "@/shared/lib/useForm/useForm"
 
 
 type UsageFormProps = {
@@ -27,11 +14,15 @@ type UsageFormProps = {
 }
 
 export function CreateUsageForm({ path, onUsageRemove }: UsageFormProps) {
-    const { ingredients, register, error } = useUsageFormVM(path)
+    const { register } = useFormContext<ProductDraft>().scope(path)
 
-    if (!ingredients) return error
-        ?   <ErrorFeedback message={error.message} />
-        :   <LoadingFeedback />
+    const { data: ingredients, error, isLoading } = useQuery(stockApi.getIngredients, {
+        key: 'ingredients',
+        staleTime: Infinity
+    })
+
+    if (isLoading) return <LoadingFeedback />
+    if (error) return <ErrorFeedback message={error.message} />
 
     return (
         <Row>

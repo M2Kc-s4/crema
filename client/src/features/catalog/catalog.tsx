@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Coffee } from "lucide-react";
 import { CATEGORIES, type Category, type Product } from "domain/product";
-import { useQuery } from "@/shared/useQuery";
+import { useQuery } from "@/shared/lib/useQuery";
 import { ErrorFeedback, Feedback, LoadingFeedback } from "@/shared/ui/feedback";
 import { menuApi } from "./api";
 import { ProductCard } from "./product-card";
@@ -13,16 +13,14 @@ export function Catalog() {
     const [category, setCategory] = useState<Category>("coffee")
     const [picked, setPicked] = useState<Product | null>(null)
 
-    const { data: products, error } = useQuery({ 
-        query: menuApi.getProductCatalog 
-    })
+    const { data: products, error, isLoading } = useQuery(menuApi.getProductCatalog)
 
 
+    if (isLoading) return <LoadingFeedback />
     if (error) return <ErrorFeedback message={error.message} />
-    if (!products) return <LoadingFeedback />
 
 
-    const filtered = products.filter((p) => p.category === category);
+    const filtered = products.filter(p => p.category === category)
 
     return (
         <Page>

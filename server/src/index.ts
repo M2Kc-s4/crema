@@ -100,4 +100,4 @@ const FAST = String.raw`
     /_/    \__,_/____/\__/  
 `
 
-// banner([RUST, BLAZING, FAST])
+banner([RUST, BLAZING, FAST])

@@ -16,6 +16,7 @@ const RegisterRequest = t.Object({
 
 export type RegisterRequest = Static<typeof RegisterRequest>
 
+
 userRoutes.post('/users',
     ({ body }) => registerUseCase(body, txm, hasher),
     { body: RegisterRequest }

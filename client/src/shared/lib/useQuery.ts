@@ -80,8 +80,7 @@ export function useQueryRegistry() {
 	return registry
 }
 
-type UseQueryOptions<T, E> = {
-	query: () => Future<T, E>
+type UseQueryOptions = {
 	key?: string
 	tags?: string[] | string
 	enabled?: boolean
@@ -89,41 +88,62 @@ type UseQueryOptions<T, E> = {
 	staleTime?: number
 }
 
-type UseQueryResult<T, E> = {
-	data: T | undefined
-	error: E | undefined
-	isLoading: boolean
-	isFetching: boolean
-	isError: boolean
-	isSuccess: boolean
-	refetch: () => void
+type LoadingState<E> = {
+    data: undefined
+    error: undefined
+    isLoading: true
+    isFetching: boolean
+    isError: false
+    isSuccess: false
 }
 
-type QueryState<T, E> = {
-	data: T | undefined
-	error: E | undefined
-	isLoading: boolean
-	isFetching: boolean
-	isError: boolean
-	isSuccess: boolean
+type SuccessState<T> = {
+    data: T
+    error: undefined
+    isLoading: false
+    isFetching: boolean  
+    isError: false
+    isSuccess: true
 }
 
+type ErrorState<T, E> = {
+    data: T | undefined
+    error: E
+    isLoading: false
+    isFetching: boolean
+    isError: true
+    isSuccess: false
+}
 
-export function useQuery<T, E = unknown>({
-	query, enabled = true, tags = EMPTY_TAGS, deps = EMPTY_DEPS, key, staleTime = 0
-}: UseQueryOptions<T, E>) {
+type QueryState<T, E> = LoadingState<E> | SuccessState<T> | ErrorState<T, E>
+
+type UseQueryResult<T, E> = QueryState<T, E> & { refetch: () => void }
+
+const loading = <T, E>(isFetching = false): QueryState<T, E> => ({
+    data: undefined, error: undefined,
+    isLoading: true, isFetching, isError: false, isSuccess: false,
+})
+
+const success = <T, E>(data: T, isFetching = false): QueryState<T, E> => ({
+    data, error: undefined,
+    isLoading: false, isFetching, isError: false, isSuccess: true,
+})
+
+const failure = <T, E>(data: T | undefined, error: E): QueryState<T, E> => ({
+    data, error,
+    isLoading: false, isFetching: false, isError: true, isSuccess: false,
+})
+
+
+export function useQuery<T, E>(
+	query: () => Future<T, E>, 
+	{ enabled = true, tags = EMPTY_TAGS, deps = EMPTY_DEPS, key, staleTime = 0 }: UseQueryOptions = {}
+): UseQueryResult<T, E> {
 	const registry = useQueryRegistry()
 
 	const [state, setState] = useState<QueryState<T, E>>(() => {
 		const entry = key ? registry.getEntry(key) : undefined
-		return {
-			data: entry?.data as T | undefined,
-			error: undefined,
-			isLoading: entry === undefined,
-			isFetching: false,
-			isError: false,
-			isSuccess: entry !== undefined,
-		}
+		return entry ? success(entry.data as T) : loading()
 	})
 
 	const queryRef = useRef(query)
@@ -138,36 +158,37 @@ export function useQuery<T, E = unknown>({
 		const k = keyRef.current
 		if (k && !registry.acquire(k)) return
 		
-		setState(s => ({ ...s, isLoading: s.data === undefined, isFetching: true, isError: false, isSuccess: false }))
+		setState(s =>
+            s.data === undefined
+                ? loading<T, E>(true)
+                : success<T, E>(s.data, true),
+        )
 
 		queryRef.current()
-			.tap(data => {
-				if (k) { registry.setCached(k, data); registry.release(k) }
-				setState({ data, error: undefined, isLoading: false, isFetching: false, isError: false, isSuccess: true })
-			})
-			.tapErr(error => {
-				if (k) registry.release(k)
-				setState(s => ({ ...s, error, isLoading: false, isFetching: false, isError: true, isSuccess: false }))
-			})
-			.recover()
-	}, [registry])
+            .tap(data => {
+                if (k) { registry.setCached(k, data); registry.release(k) }
+                setState(success<T, E>(data))
+            })
+            .tapErr(error => {
+                if (k) registry.release(k)
+                setState(s => failure<T, E>(s.data, error))
+            })
+            .recover()
+    }, [registry])
 
 	useEffect(() => {
-		if (!enabled) return
-		const entry = key ? registry.getEntry(key) : undefined
-		if (entry && Date.now() - entry.updatedAt < staleTime) return
-		run()
-	}, [enabled, key, ...deps])
+        if (!enabled) return
+        const entry = key ? registry.getEntry(key) : undefined
+        if (entry && Date.now() - entry.updatedAt < staleTime) return
+        run()
+    }, [enabled, key, ...deps])
 
-	useEffect(() => {
-		if (!key) return
-		return registry.subscribe(key, data =>
-			setState(s => ({
-				...s, data: data as T, error: undefined,
-				isLoading: false, isFetching: false, isError: false, isSuccess: true,
-			})),
-		)
-	}, [registry, key])
+    useEffect(() => {
+        if (!key) return
+        return registry.subscribe(key, data =>
+            setState(s => success<T, E>(data as T, s.isFetching)),
+        )
+    }, [registry, key])
 
 	useEffect(() => {
 		const all = key && !tagsArray.length ? [key] : tagsArray
@@ -182,14 +203,13 @@ type FutureFunction<T, E, P extends Array<any>> = (...args: P) => Future<T, E>
 
 
 type UseMutationOptions<T, E, P extends Array<any>> = {
-	mutation: FutureFunction<T, E, P>
 	refetches?: ((data: T, ...args: P) => string[] | string) | string[] | string
 	onSuccess?: (data: T) => void
 	onError?: (error: E) => void
 }
 
 
-type UseMutationResult<T, E, P extends Array<any>> = {
+type UseMutationResult<P extends Array<any>> = {
 	mutate: (...args: P) => void
 	isPending: boolean
 	isError: boolean
@@ -204,7 +224,7 @@ type MutationState = {
 }
 
 
-export function useMutation<T, E, P extends Array<any>>(params: UseMutationOptions<T, E, P>): UseMutationResult<T, E, P> {
+export function useMutation<T, E, P extends Array<any>>(mutation: FutureFunction<T, E, P>, params: UseMutationOptions<T, E, P> = {}): UseMutationResult<P> {
 	const registry = useQueryRegistry()
 	const [state, setState] = useState<MutationState>({
 		isPending: false,
@@ -212,23 +232,23 @@ export function useMutation<T, E, P extends Array<any>>(params: UseMutationOptio
 		isSuccess: false,
 	})
 
-	const mutation = useRef(params.mutation)
-	mutation.current = params.mutation
-	const refetches = useRef(params.refetches)
-	refetches.current = params.refetches
-	const onSuccess = useRef(params.onSuccess)
-	onSuccess.current = params.onSuccess
-	const onError = useRef(params.onError)
-	onError.current = params.onError
+	const mutationRef = useRef(mutation)
+	mutationRef.current = mutation
+	const refetchesRef = useRef(params.refetches)
+	refetchesRef.current = params.refetches
+	const onSuccessRef = useRef(params.onSuccess)
+	onSuccessRef.current = params.onSuccess
+	const onErrorRef = useRef(params.onError)
+	onErrorRef.current = params.onError
 
 	const mutate = useCallback((...args: P) => {
 		setState({ isPending: true, isError: false, isSuccess: false })
 
-		void mutation.current(...args).tap(data => {
-			if (refetches.current) {
-				const toRefetch = typeof refetches.current === "function"
-					? refetches.current(data, ...args)
-					: refetches.current
+		void mutationRef.current(...args).tap(data => {
+			if (refetchesRef.current) {
+				const toRefetch = typeof refetchesRef.current === "function"
+					? refetchesRef.current(data, ...args)
+					: refetchesRef.current
 				registry.refetch(
 					typeof toRefetch === 'string'
 						? 	[toRefetch]
@@ -236,11 +256,11 @@ export function useMutation<T, E, P extends Array<any>>(params: UseMutationOptio
 				) 
 			}
 
-			onSuccess.current?.(data)
+			onSuccessRef.current?.(data)
 			setState({ isPending: false, isError: false, isSuccess: true })
 		})
 		.tapErr(error => {			
-			onError.current?.(error)
+			onErrorRef.current?.(error)
 			setState({ isPending: false, isError: true, isSuccess: false })
 		})
 		.recover()

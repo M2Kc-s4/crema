@@ -1,8 +1,8 @@
-import { useMutation } from "@/shared/useQuery";
+import { useMutation } from "@/shared/lib/useQuery";
 import { stockApi } from "./api";
 import { Form, FormActions, FormError, FormField, Input } from "@/shared/ui/form";
 import { Button, Modal } from "@/shared/ui/layout";
-import { createForm } from "@/shared/useForm";
+import { useForm } from "@/shared/lib/useForm/useForm";
 
 type CreateIngredientDialogProps = {
     onClose: () => void
@@ -12,17 +12,15 @@ type Form = {
     name: string
 }
 
-const defaultValues: Form = {
+const emptyForm: Form = {
     name: ''
 }
 
-const { useForm } = createForm(defaultValues)
 
 export function CreateIngredientDialog({ onClose }: CreateIngredientDialogProps) {
-    const { register, setError, formError: error, handleSubmit } = useForm()
+    const { register, setError, formError, handleSubmit } = useForm(emptyForm)
 
-    const { mutate: createIngredient } = useMutation({
-        mutation: stockApi.createIngredient,
+    const { mutate: createIngredient } = useMutation(stockApi.createIngredient, {
         refetches: 'stock',
         onSuccess: onClose,
         onError: setError
@@ -39,7 +37,7 @@ export function CreateIngredientDialog({ onClose }: CreateIngredientDialogProps)
                     <Input {...register('name')} placeholder="Например, сироп карамельный" required />
                 </FormField>
 
-                <FormError error={error} />
+                <FormError error={formError} />
 
                 <FormActions>
                     <Button ghost onClick={onClose}>Отмена</Button>

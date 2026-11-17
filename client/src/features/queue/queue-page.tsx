@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@/shared/useQuery"
+import { useQuery, useMutation } from "@/shared/lib/useQuery"
 import { queueApi } from "./api"
 import { Order } from "domain/order"
 import type { ID } from "domain/shared"
@@ -16,21 +16,17 @@ const COLUMNS = [
 
 
 export function QueuePage() {
-    const { data: queue, error } = useQuery({ 
-        query: queueApi.getQueue,
-        tags: 'queue' 
-    })
+    const { data: queue, error, isLoading } = useQuery(queueApi.getQueue, { tags: 'queue' })
 
-    const { mutate: issue } = useMutation({
-        mutation: queueApi.issue,
-        refetches: 'queue'
-    })
+    const { mutate: issue } = useMutation(queueApi.issue, { refetches: 'queue' })
+    
 
+    if (isLoading) return <LoadingFeedback />
     if (error) return <ErrorFeedback message={error.message} />
-    if (!queue) return <LoadingFeedback />
 
     if (!queue.length) return <Feedback title="Очередь пуста" icon={NutOff} />    
 
+    
     return (
         <Page>
             <Text xl>Очередь на сейчас</Text>

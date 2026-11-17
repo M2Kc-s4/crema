@@ -10,6 +10,7 @@ import { CartPage } from "@/features/cart/cart-page";
 import { StockPage } from "@/features/stock/stock-page";
 import { GuestGuard } from "./guards/guest-guard";
 import { CreateProductPage } from "@/features/create-product/create-product-page";
+import { RegisterPage } from "@/features/register/register-page";
 
 export function Router() {
     return (
@@ -33,6 +34,7 @@ export function Router() {
             </Route>
 
             <Route path={ROUTES.login} element={<GuestGuard><LoginPage /></GuestGuard>} />
+            <Route path={ROUTES.register} element={<GuestGuard><RegisterPage /></GuestGuard>} />
 
             <Route path="*" element={<Navigate to={ROUTES.catalog} />} />
         </Routes>

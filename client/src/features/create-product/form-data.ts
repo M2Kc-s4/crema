@@ -1,5 +1,3 @@
-import { createForm } from "@/shared/useForm"
-
 export type UsageDraft = {
     ingredientId: string
     qty: number
@@ -45,5 +43,3 @@ export const emptyUsage: UsageDraft = {
     ingredientId: '',
     qty: NaN
 }
-
-export const { useForm: useCreateProductForm, useFormContext: useCreateProductFormContext } = createForm(emptyProduct)

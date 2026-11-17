@@ -1,14 +1,12 @@
 import { useNavigate } from "react-router-dom"
-import { emptyOption, useCreateProductForm, useCreateProductFormContext } from "./form-data"
-import { Choice, Form, FormError, FormField, Input } from "@/shared/ui/form"
-import { useMutation, useQuery } from "@/shared/useQuery"
-import { ROUTES } from "@/app/routes"
-import { stockApi } from "../stock/api"
+import { Choice, FormError, FormField, Input } from "@/shared/ui/form"
 import { Button, Column, Row, Section, Spacer, Text } from "@/shared/ui/layout"
 import { CATEGORIES, Category } from "domain/product"
 import { Feedback } from "@/shared/ui/feedback"
 import { Layers } from "lucide-react"
 import { CreateOptionForm } from "./create-option-form"
+import { useFormContext } from "@/shared/lib/useForm/useForm"
+import { emptyOption, type ProductDraft } from "./form-data"
 
 
 const CATEGORIES_LABEL: Record<Category, string> = {
@@ -18,8 +16,8 @@ const CATEGORIES_LABEL: Record<Category, string> = {
 }
 
 
-function useVM() {
-    const { register, setError, formError,useFieldArray } = useCreateProductFormContext()
+export function CreateProductForm() {
+    const { register, setError, formError, useFieldArray } = useFormContext<ProductDraft>()
     const navigate = useNavigate()
 
     const {
@@ -28,18 +26,11 @@ function useVM() {
         remove: removeOption
     } = useFieldArray('options')
 
-    return {
-        onOptionAdd: () => addOption(emptyOption),
-        onOptionRemove: (i: number) => () => removeOption(i),
-        onCancel: () => navigate(-1),
-        register, formError,
-        options
-    }
-}
 
+    const onOptionAdd = () => addOption(emptyOption)
+    const onOptionRemove = (i: number) => () => removeOption(i)
+    const onCancel = () => navigate(-1)
 
-export function CreateProductForm() {
-    const { register, onCancel, onOptionAdd, onOptionRemove, options, formError } = useVM()
 
     return (
         <>

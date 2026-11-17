@@ -1,24 +1,9 @@
-import type { PathTo } from "@/shared/useForm/types"
-import { emptyUsage, useCreateProductFormContext, type ProductDraft, type VariantDraft } from "./form-data"
+import type { PathTo } from "@/shared/lib/useForm/types" 
 import { Button, Column, Row, Section, Text } from "@/shared/ui/layout"
 import { FormField, Input } from "@/shared/ui/form"
 import { CreateUsageForm } from "./create-usage-form"
-
-function useVariantFormVM(path: PathTo<ProductDraft, VariantDraft>) {
-    const { register, useFieldArray } = useCreateProductFormContext(path)
-
-    const {
-        fields: usages,
-        append: addUsage,
-        remove: removeUsage
-    } = useFieldArray('uses')
-
-    return {
-        register, usages,
-        onUsageAdd: () => addUsage(emptyUsage),
-        onUsageRemove: (i: number) => () => removeUsage(i)
-    }
-}
+import { useFormContext } from "@/shared/lib/useForm/useForm"
+import { emptyUsage, type ProductDraft, type VariantDraft } from "./form-data"
 
 
 type VariantFormProps = {
@@ -27,7 +12,18 @@ type VariantFormProps = {
 }
 
 export function CreateVariantForm({ path, onVariantRemove }: VariantFormProps) {
-    const { register, usages, onUsageAdd, onUsageRemove } = useVariantFormVM(path)
+    const { register, useFieldArray } = useFormContext<ProductDraft>().scope(path)
+
+    const {
+        fields: usages,
+        append: addUsage,
+        remove: removeUsage
+    } = useFieldArray('uses')
+
+
+    const onUsageAdd = () => addUsage(emptyUsage)
+    const onUsageRemove = (i: number) => () => removeUsage(i)
+
 
     return (
         <Section sm>

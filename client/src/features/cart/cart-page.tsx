@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@/shared/useQuery"
+import { useMutation, useQuery } from "@/shared/lib/useQuery"
 import { cartApi } from "./api"
 import { CartItem, User } from "domain/user"
 import { Product } from "domain/product"
@@ -10,32 +10,31 @@ import { Button, Page, Row, Section, Spacer, Text } from "@/shared/ui/layout"
 export function CartPage() {    
     const { updateCurrentUser } = useCurrentUser()
 
-    const { data: cart, error } = useQuery({
-        query: cartApi.getCart,
+    const { data: cart, error, isLoading } = useQuery(cartApi.getCart, {
         tags: 'cart'
     })
 
-    const { mutate: placeOrder, isPending: isPlacing } = useMutation({
-        mutation: cartApi.placeOrder,
+    const { mutate: placeOrder, isPending: isPlacing } = useMutation(cartApi.placeOrder, {
         onSuccess: updateCurrentUser,
         onError(error) {
             alert(error.message)
         },
     })
 
-    const { mutate: removeFromCard } = useMutation({
-        mutation: cartApi.removeFromCard,
+    const { mutate: removeFromCard } = useMutation(cartApi.removeFromCard, {
         onSuccess: updateCurrentUser,
         refetches: "cart"
     })
 
+    
+    if (isLoading) return <LoadingFeedback />
     if (error) return <ErrorFeedback message={error.message} />
-    if (!cart) return <LoadingFeedback />
 
 
     const sum = cart.reduce((prev, [cartItem, product]) => 
         prev + Product.calculateTotalPrice(product, cartItem.options) * cartItem.qty, 0
     )
+    
     const onItemRemove = (item: CartItem) => () => removeFromCard({cartItemId: item.id})
 
 

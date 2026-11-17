@@ -2,21 +2,19 @@ import { useGuardedCurrentUser } from "../providers/current-user-provider"
 import { Outlet, useNavigate } from "react-router-dom"
 import { ROUTES } from "../routes"
 import { Button, Row, Section, Spacer, Text } from "@/shared/ui/layout"
-import { useMutation } from "@/shared/useQuery"
+import { useMutation } from "@/shared/lib/useQuery"
 
 
 function Header() {
     const navigate = useNavigate()
     const { user, logout } = useGuardedCurrentUser()
 
-    const { mutate } = useMutation({
-        mutation: logout
-    })
+    const { mutate } = useMutation(logout)
 
     return (
         <Section className="bg-espresso text-milk rounded-none">
             <Row>
-                <Text bold>Крема</Text>
+                <Text onClick={() => navigate(ROUTES.catalog)} bold>Крема</Text>
 
                 <Spacer />
 

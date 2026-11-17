@@ -73,7 +73,7 @@ export function User(email: Email, hashedPassword: HashedPassword, role: UserRol
 
 export namespace User {
     export function addToCart(user: Mutable<User>, product: Product, qty: Quantity, options: Record<ID<Option>, ID<Variant>>) {
-        User.assertIsCustomer(user)
+        // User.assertIsCustomer(user)
 
         const newKey = getCartItemKey(product.id, options)
 
@@ -90,7 +90,7 @@ export namespace User {
     }
 
     export function removeFromCart(user: Mutable<User>, cartItemId: ID<CartItem>) {
-        User.assertIsCustomer(user)
+        // User.assertIsCustomer(user)
 
         const cartItem = user.cart.find(i => i.id === cartItemId)
     
@@ -106,7 +106,7 @@ export namespace User {
     }
 
     export function clearCart(user: Mutable<User>) {
-        User.assertIsCustomer(user)
+        // User.assertIsCustomer(user)
 
         user.cart = []
     }

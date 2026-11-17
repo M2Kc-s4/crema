@@ -1,25 +1,25 @@
-import { useMutation } from "@/shared/useQuery";
+import { useMutation } from "@/shared/lib/useQuery";
 import type { Ingredient } from "domain/ingridient";
 import { stockApi } from "./api";
 import { Form, FormActions, FormError, FormField, Input } from "@/shared/ui/form";
 import { Button, Modal } from "@/shared/ui/layout";
-import { createForm } from "@/shared/useForm";
+import { useForm } from "@/shared/lib/useForm/useForm";
 type RestockDialogProps = {
     ingredient: Ingredient
     onClose: () => void
 }
 
-type RestockDraft = {
+type Form = {
     qty: number
 }
 
-const { useForm } = createForm<RestockDraft>({ qty: NaN })
+const emptyForm: Form =  { qty: NaN }
+
 
 function useVM(ingredient: Ingredient, onClose: () => void) {
-    const { register, setError, handleSubmit, formError } = useForm()
+    const { register, setError, handleSubmit, formError } = useForm(emptyForm)
 
-    const { mutate: restock, isPending: loading } = useMutation({
-        mutation: stockApi.restockIngredient,
+    const { mutate: restock, isPending: loading } = useMutation(stockApi.restockIngredient, {
         refetches: "stock",
         onSuccess: onClose,
         onError: setError

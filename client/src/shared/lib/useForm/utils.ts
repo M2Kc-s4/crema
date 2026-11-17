@@ -1,8 +1,8 @@
-import type { FormEvent, FormInput, FormFieldValue, FormValues, PathToFields, PathValue, Path } from "./types";
+import type { FormEvent, FormFieldValue, FormInput, FormValues, PathTo, PathValue } from "./types";
 
 const BLOCKED_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
-export function getIn<T extends FormValues, P extends Path<T>>(
+export function getIn<T extends FormValues, P extends PathTo<T, unknown>>(
     obj: T,
     path: P,
 ): PathValue<T, P> {
@@ -18,7 +18,7 @@ export function getIn<T extends FormValues, P extends Path<T>>(
 
 export function setIn<
     T extends FormValues,
-    P extends Path<T>,
+    P extends PathTo<T, unknown>,
     V extends PathValue<T, P>
 >(
     obj: T,
@@ -34,14 +34,14 @@ export function setIn<
         const key = segments[index]!
 
         if (Array.isArray(current)) {
-            const copy = current.slice();
-            const arrayIndex = Number(key);
+            const copy = current.slice()
+            const arrayIndex = Number(key)
 
             copy[arrayIndex] = index === segments.length - 1
                 ? value as FormValues
-                : set(copy[arrayIndex]!, index + 1) as FormValues;
+                : set(copy[arrayIndex]!, index + 1) as FormValues
 
-            return copy;
+            return copy
         }
 
         if (index === segments.length - 1) {
@@ -70,6 +70,7 @@ export function extractFromEvent(event: FormEvent): FormFieldValue {
         case 'range': {
             return (target as HTMLInputElement).valueAsNumber
         }
+
         default:
             return target.value
     }

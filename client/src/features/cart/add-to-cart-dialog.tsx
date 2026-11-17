@@ -1,11 +1,11 @@
-import { useMutation } from "@/shared/useQuery"
+import { useMutation } from "@/shared/lib/useQuery"
 import { Product, type Option, type Variant } from "domain/product"
 import type { ID } from "domain/shared"
 import { cartApi } from "./api"
 import { useGuardedCurrentUser } from "@/app/providers/current-user-provider"
 import { Button, Column, Modal, Text } from "@/shared/ui/layout"
 import { Choice, Form, FormError, FormField, Input } from "@/shared/ui/form"
-import { createForm } from "@/shared/useForm"
+import { useForm } from "@/shared/lib/useForm/useForm"
 
 
 type AddToCartDialogProps = {
@@ -24,24 +24,19 @@ const defaultValues: Form = {
     options: {}
 }
 
-const { useForm } = createForm(defaultValues)
-
 
 export function AddToCartDialog({ onClose, product }: AddToCartDialogProps) {
-    const { register, handleSubmit, formError: error, watch, setError } = useForm()
+    const { register, handleSubmit, formError, watch, setError } = useForm(defaultValues)
 
     const { updateCurrentUser } = useGuardedCurrentUser()
 
-    const { mutate: addToCart } = useMutation({
-        mutation: cartApi.addToCart,
+    const { mutate: addToCart } = useMutation(cartApi.addToCart, {
         onSuccess: updateCurrentUser,
         onError: setError,
     })
 
 
     const selected = watch('options')    
-    console.log(watch());
-    
     const totalPrice = Product.calculateTotalPrice(product, selected)
 
     const onSubmit = handleSubmit(d => addToCart({...d, productId: product.id}))
@@ -72,7 +67,7 @@ export function AddToCartDialog({ onClose, product }: AddToCartDialogProps) {
                     <Input {...register('qty')} type="number" required />
                 </FormField>
 
-                <FormError error={error} /> 
+                <FormError error={formError} /> 
 
                 <Button gold submit>
                     Добавить в корзину за {totalPrice} ₽
