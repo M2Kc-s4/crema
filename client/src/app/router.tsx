@@ -11,6 +11,8 @@ import { StockPage } from "@/features/stock/stock-page";
 import { GuestGuard } from "./guards/guest-guard";
 import { CreateProductPage } from "@/features/create-product/create-product-page";
 import { RegisterPage } from "@/features/register/register-page";
+import { OrderHistoryPage } from "@/features/order-history/order-history-page";
+import { StatsPage } from "@/features/stats/stats-page";
 
 export function Router() {
     return (
@@ -31,6 +33,10 @@ export function Router() {
                 <Route path={ROUTES.stock} element={<StockPage />} />
 
                 <Route path={ROUTES.createProduct} element={<CreateProductPage />} />
+
+                <Route path={ROUTES.orderHistory} element={<OrderHistoryPage />} />
+                
+                <Route path={ROUTES.stats} element={<StatsPage />} />
             </Route>
 
             <Route path={ROUTES.login} element={<GuestGuard><LoginPage /></GuestGuard>} />

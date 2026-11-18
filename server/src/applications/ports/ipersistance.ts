@@ -65,6 +65,7 @@ export interface IProductReadPerository extends IReadRepository<Product> {}
 export interface IOrderReadPerository extends IReadRepository<Order> {
     getAllOpened(): Promise<Order[]>
     getOpenedByUser(user: User): Promise<Order | null>
+    listByUser(user: User): Promise<Order[]>
 }
 
 export interface IIngredientReadPerository extends IReadRepository<Ingredient> {}
@@ -72,7 +73,7 @@ export interface IIngredientReadPerository extends IReadRepository<Ingredient> {
 export interface IReader {
     users: IUserReadPerository
     products: IProductReadPerository
-    ingreduents: IIngredientReadPerository
+    ingredients: IIngredientReadPerository
     sessions: ISessionReadPerository
     orders: IOrderReadPerository
 }

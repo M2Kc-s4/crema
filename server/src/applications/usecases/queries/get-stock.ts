@@ -15,7 +15,7 @@ export async function getStockUseCase(cmd: Command, reader: IReader) {
     if (!User.isBarman(user)) throw ErrForbidden
 
     const products = await reader.products.getAll()
-    const ingredients = await reader.ingreduents.getAll()
+    const ingredients = await reader.ingredients.getAll()
 
     return { products, ingredients }
 }

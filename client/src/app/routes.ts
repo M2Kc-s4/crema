@@ -6,5 +6,7 @@ export const ROUTES = {
     track: '/track',
     stock: '/stock',
     createProduct: '/create-product',
-    register: '/register'
+    register: '/register',
+    orderHistory: '/history',
+    stats: '/stats'
 }

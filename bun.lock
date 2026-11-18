@@ -45,6 +45,7 @@
         "@m2k-5f/pgtx": "^3.1.1",
         "domain": "workspace:*",
         "elysia": "^1.4.30",
+        "fluent-future": "^1.5.3",
         "jose": "^6.2.12",
         "nucleus-mold": "^1.0.3",
       },

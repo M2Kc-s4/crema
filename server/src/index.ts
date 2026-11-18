@@ -11,6 +11,8 @@ import { cartRoutes } from "./presentation/cart";
 import { queueRoutes } from "./presentation/queue";
 import { trackRoutes } from "./presentation/track";
 import { stockRoutes } from "./presentation/stock";
+import { orderHistoryRoutes } from "./presentation/order-history";
+import { statsRoutes } from "./presentation/stats";
 
 export const app = new Elysia()
     .error({
@@ -70,6 +72,8 @@ app.use(cartRoutes)
 app.use(queueRoutes)
 app.use(trackRoutes)
 app.use(stockRoutes)
+app.use(orderHistoryRoutes)
+app.use(statsRoutes)
 
 app.listen({port: 8000, reusePort: true})
 

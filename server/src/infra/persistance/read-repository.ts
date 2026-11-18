@@ -70,20 +70,28 @@ class OrderReadRepository extends ReadRepository<Order> implements IOrderReadPer
         
         return rows.map(r => r.data)
     }
+
+    async listByUser(user: User): Promise<Order[]> {
+        const rows = await this.pool.query<DataRow<Order>>`
+            select data from orders
+            where data->>'userId' = ${user.id}`
+
+        return rows.map(r => r.data)
+    }
 }
 
 export class Reader implements IReader {
     users: IUserReadPerository;
     sessions: ISessionReadPerository;
     products: IProductReadPerository;
-    ingreduents: IIngredientReadPerository;
+    ingredients: IIngredientReadPerository;
     orders: IOrderReadPerository;
 
     constructor(pool: Pool) {
         this.users = new UserReadRepository(pool)
         this.sessions = new SessionReadRepository(pool)
         this.products = new ProductReadRepository(pool)
-        this.ingreduents = new IngredientReadRepository(pool)
+        this.ingredients = new IngredientReadRepository(pool)
         this.orders = new OrderReadRepository(pool)
     }
 }
