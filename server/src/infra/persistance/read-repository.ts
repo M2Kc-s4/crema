@@ -41,6 +41,14 @@ class UserReadRepository extends ReadRepository<User> implements IUserReadPerosi
 
 class SessionReadRepository extends ReadRepository<Session> implements ISessionReadPerository {
     table = 'sessions'
+
+    async listByUser(user: User): Promise<Session[]> {
+        const rows = await this.pool.query<DataRow<Session>>`
+            select data from sessions
+            where data->>'userId' = ${user.id}`
+
+        return rows.map(r => r.data)
+    }
 }
 
 class ProductReadRepository extends ReadRepository<Product> implements IProductReadPerository {

@@ -7,6 +7,6 @@ export const ROUTES = {
     stock: '/stock',
     createProduct: '/create-product',
     register: '/register',
-    orderHistory: '/history',
-    stats: '/stats'
+    stats: '/stats',
+    profile: '/profile'
 }

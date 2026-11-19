@@ -21,6 +21,30 @@ export function formatTime(iso: string): string {
 }
 
 
+export function formatDate(iso: string) {
+    return new Date(iso).toLocaleString("ru-RU", { dateStyle: "short", timeStyle: "short" })
+}
+
+const relativeFormat = new Intl.RelativeTimeFormat("ru", { numeric: "auto" })
+
+const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+    ["day", 86_400_000],
+    ["hour", 3_600_000],
+    ["minute", 60_000],
+]
+
+export function formatAgo(iso: string) {
+    const diff = Math.min(0, new Date(iso).getTime() - Date.now())
+
+    for (const [unit, ms] of UNITS) {
+        if (Math.abs(diff) >= ms) return relativeFormat.format(Math.round(diff / ms), unit)
+    }
+
+    return "только что"
+}
+
+
+
 const twMerge = extendTailwindMerge({
     extend: {
         theme: {

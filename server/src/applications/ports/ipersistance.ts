@@ -58,7 +58,9 @@ export interface IReadRepository<Tentity extends EntityWithID, TID = ID<Tentity>
 
 export interface IUserReadPerository extends IReadRepository<User> {}
 
-export interface ISessionReadPerository extends IReadRepository<Session> {}
+export interface ISessionReadPerository extends IReadRepository<Session> {
+    listByUser(user: User): Promise<Session[]>
+}
 
 export interface IProductReadPerository extends IReadRepository<Product> {}
 

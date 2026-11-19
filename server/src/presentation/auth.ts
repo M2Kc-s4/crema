@@ -5,6 +5,7 @@ import { ErrUnauthorized } from "@/error";
 import { refreshSessionUseCase } from "@/applications/usecases/commands/refresh-session";
 import { getUserByIdUseCase } from "@/applications/usecases/queries/get-user-by-id";
 import { authMacro } from "./shared";
+import { revokeSessionUseCase } from "@/applications/usecases/commands/revoke-session";
 
 
 export const authRoutes = new Elysia().use(authMacro)
@@ -19,13 +20,16 @@ export type LoginRequest = Static<typeof LoginRequest>
 
 authRoutes.post("/login", 
     async ({
-        body, 
+        body: {email, password}, 
+        headers,
         cookie: { sessionRefresh }
     }) => {
+        const device = deviceName(headers["user-agent"])
+
         const {
             refresh,
             access,
-        } = await loginUseCase(body, txm, hasher, signer)
+        } = await loginUseCase({ email, password, device }, txm, hasher, signer)
 
         sessionRefresh.set({
             value: refresh,
@@ -108,3 +112,30 @@ authRoutes.post('/refresh',
         auth: true
     }
 )
+
+.post('/sessions/:sessionId/revoke',
+    ({ userId, params: { sessionId } }) => revokeSessionUseCase({ userId, sessionId }, txm),
+    { auth: true }
+)
+
+export function deviceName(ua: string | undefined): string {
+    const browser =
+        !ua ? null :
+        /Edg\//.test(ua) ? "Edge" :
+        /OPR\/|Opera/.test(ua) ? "Opera" :
+        /Firefox\/|FxiOS/.test(ua) ? "Firefox" :
+        /Chrome\/|CriOS/.test(ua) ? "Chrome" :
+        /Safari\//.test(ua) ? "Safari" :
+        null
+
+    const os =
+        !ua ? null :
+        /Windows/.test(ua) ? "Windows" :
+        /Android/.test(ua) ? "Android" :
+        /iPhone|iPad|iPod/.test(ua) ? "iOS" :
+        /Mac OS X|Macintosh/.test(ua) ? "macOS" :
+        /Linux/.test(ua) ? "Linux" :
+        null
+
+    return [browser, os].filter(Boolean).join(", ") || "Неизвестное устройство"
+}

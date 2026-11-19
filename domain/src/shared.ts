@@ -47,3 +47,16 @@ export function Name(string: string) {
 
     return string as Name
 }
+
+
+export type Time = Branded<string, "Time">
+
+export function Time(string: string) {
+    return new Date(string).toISOString() as Time
+}
+
+export namespace Time {
+    export function now() {
+        return new Date().toISOString() as Time
+    }
+}

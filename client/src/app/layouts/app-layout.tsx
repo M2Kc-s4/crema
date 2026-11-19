@@ -29,12 +29,11 @@ function Header() {
                 {User.isCustomer(user) &&
                     <>
                         <Button sm onClick={() => navigate(ROUTES.track)}>Текущий заказ</Button>
-                        <Button onClick={() => navigate(ROUTES.orderHistory)}>История заказов</Button>
                         <Button onClick={() => navigate(ROUTES.cart)}>Корзина ({user.cart.length})</Button>
                     </>
                 }
                             
-                <Text bold>{user.email}</Text>
+                <Button onClick={() => navigate(ROUTES.profile)} link gold sm >{user.email}</Button>
                 
                 <Button onClick={mutate} link dark sm>Выйти</Button>
 

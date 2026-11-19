@@ -16,15 +16,16 @@ export async function refreshSessionUseCase(cmd: Command, txm: ITransactionManag
         const session = await uow.session.getByIDForUpdate(sessionID)
         if (!session) throw ErrNotFound
 
-        Session.assertSessionToken(session, oldRefresh)
+        Session.assertActive(session)
 
         const user = await uow.user.getByID(session.userId)
         if (!user) throw ErrNotFound
 
         const refresh = await signer.signRefresh(session)
-        const access = await signer.signAccess(user)
 
-        Session.updateSessionToken(session, refresh)
+        Session.rotate(session, oldRefresh, refresh)
+
+        const access = await signer.signAccess(user)
 
         await uow.session.save(session)
 

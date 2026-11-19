@@ -75,14 +75,12 @@ export namespace Product {
         return option
     }
 
-
     export function getVariant(option: Option, variantId: ID<Variant>): Variant {
         const variant = option.variants.find(v => v.id === variantId)
         if (!variant) throw ErrUnknownVariant
 
         return variant
     }
-
 
     export function resolveSelection(product: Product, selection: Record<ID<Option>, ID<Variant>>) {
         return getEntries(selection).map(([optionId, variantId]) => {
@@ -94,7 +92,6 @@ export namespace Product {
         })
     }
 
-
     export function assertSelectionValid(product: Product, selection: Record<ID<Option>, ID<Variant>>) {
         if (getKeys(selection).length !== product.options.length) throw ErrIncompleteSelection
 
@@ -105,7 +102,6 @@ export namespace Product {
         })
     }
 
-
     export function calculateTotalPrice(product: Product, selection: Record<ID<Option>, ID<Variant>>) {
         let price = product.price
 
@@ -115,7 +111,6 @@ export namespace Product {
 
         return price
     }
-
 
     export function calculateIngridientUsage(
         product: Product,
@@ -135,11 +130,9 @@ export namespace Product {
         return usage
     }
 
-
     export function isVariantAvailable(variant: Variant, stock: ReadonlyMap<ID<Ingredient>, number>): boolean {
         return variant.uses.every(u => (stock.get(u.ingridientId) ?? 0) >= u.qty)
     }
-
 
     export function canPrepare(
         product: Product,
