@@ -3,7 +3,7 @@ import { trackApi } from "./api"
 import { Order, ORDER_STATUSES, OrderItem, type OrderStatus } from "domain/order"
 import { CircleX, Feather } from "lucide-react"
 import { ErrorFeedback, Feedback, LoadingFeedback } from "@/shared/ui/feedback"
-import { Button, Column, Page, Row, Section, Step, Text } from "@/shared/ui/layout"
+import { Button, Column, Page, Row, Section, Spacer, Step, Text } from "@/shared/ui/layout"
 
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
@@ -36,14 +36,13 @@ export function TrackPage() {
     if (!track.order) return <Feedback title="У вас нет активных заказов" icon={CircleX} />
     
 
-    const { order, products } = track
-    const currentIndex = STATUS_INDEX[order.status]
+    const currentIndex = STATUS_INDEX[track.order.status]
     
 
     return (
         <Page>
             <Text xl>
-                {STATUS_TITLE[order.status]}
+                {STATUS_TITLE[track.order.status]}
             </Text>
 
             <Row>
@@ -59,23 +58,33 @@ export function TrackPage() {
             </Row>
 
             <Section>
-                {order.items.map(item => {
-                    const product = products.find(p => p.id === item.productId)
-                    if (!product) return null
+                {track.order.items.map((item, i) =>
+                    <Row key={i} line>
+                        <Text>{item.name}</Text>
+                        <Text>{item.qty} × {item.unitPrice} ₽</Text>
+                    </Row>
+                )}
 
-                    return (
-                        <Row key={item.productId} line>
-                            <Text>{item.name}</Text>
-                            <Text>{item.qty} × {item.unitPrice} ₽</Text>
+                {track.order.discount > 0 && 
+                    <>
+                        <Row>
+                            <Text>Сумма</Text>
+                            <Spacer />
+                            <Text>{Order.subtotal(track.order)} ₽</Text>
                         </Row>
-                    )
-                })}
+                        <Row>
+                            <Text>Скидка</Text>
+                            <Spacer />
+                            <Text>−{track.order.discount} ₽</Text>
+                        </Row>
+                    </>
+                }
 
                 <Row>
-                    <Text bold>Итого {order.total} ₽</Text>
+                    <Text bold>Итого {track.order.total} ₽</Text>
 
-                    {Order.isIssued(order) && 
-                        <Button loading={isPending} onClick={pickUp} >
+                    {Order.isIssued(track.order) &&
+                        <Button loading={isPending} onClick={pickUp}>
                             Забрать заказ
                         </Button>
                     }

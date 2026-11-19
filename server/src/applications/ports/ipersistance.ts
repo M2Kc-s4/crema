@@ -32,6 +32,7 @@ export interface IProductRepository extends IWriteRepository<Product> {}
 export interface IOrderRepository extends IWriteRepository<Order> {
     hasOpenedByUser(user: User): Promise<boolean>
     getOpenedByUserForUpdate(user: User): Promise<Mutable<Order> | null>
+    listByUser(user: User): Promise<Order[]>
 }
 
 export interface IIngredientRepository extends IWriteRepository<Ingredient> {}

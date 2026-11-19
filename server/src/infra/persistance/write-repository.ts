@@ -101,4 +101,12 @@ export class OrderRepository extends Repository<Order> implements IOrderReposito
 
         return row?.data as Mutable<Order> ?? null
     }
+
+    async listByUser(user: User): Promise<Order[]> {
+        const rows = await this.tx.query<DataRow<Order>>`
+            select data from orders
+            where data->>'userId' = ${user.id}`
+
+        return rows.map(r => r.data)
+    }
 }

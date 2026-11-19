@@ -33,7 +33,7 @@ function Header() {
                     </>
                 }
                             
-                <Button onClick={() => navigate(ROUTES.profile)} link gold sm >{user.email}</Button>
+                <Button onClick={() => navigate(ROUTES.profile)} gold sm >{user.email}</Button>
                 
                 <Button onClick={mutate} link dark sm>Выйти</Button>
 

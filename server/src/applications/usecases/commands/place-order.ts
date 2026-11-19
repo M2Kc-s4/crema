@@ -5,6 +5,7 @@ import { Product } from "domain/product";
 import { getEntries } from "domain/lib";
 import { Ingredient } from "domain/ingridient";
 import type { ITransactionManager } from "@/applications/ports/ipersistance";
+import { Loyalty } from "domain/loyalty";
 
 type Command = {
     userId: string
@@ -45,10 +46,13 @@ export function placeOrderUseCase(cmd: Command, txm: ITransactionManager) {
             orderItems.push(
                 OrderItem(product, item)
             )
-
         }
 
-        const order = Order(user, orderItems)
+        const pastOrders = await uow.order.listByUser(user)
+
+        const discount = Loyalty.calculateDiscount(orderItems, Loyalty.countCups(pastOrders))
+
+        const order = Order(user, orderItems, discount)
 
         User.clearCart(user)
 

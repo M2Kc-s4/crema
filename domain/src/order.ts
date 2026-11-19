@@ -1,7 +1,7 @@
 import { DomainError } from "./error"
 import type { Mutable } from "./lib"
-import { Product, Variant, Option } from "./product"
-import { ID, Name, Price, Quantity } from "./shared"
+import { Product, type Category, Variant, Option } from "./product"
+import { ID, Name, Price, Quantity, Time } from "./shared"
 import type { CartItem, User } from "./user"
 
 
@@ -14,6 +14,7 @@ export const ErrParallelOrders = new DomainError("Нельзя создать н
 export const ErrOrderNotIssued = new DomainError("Нельзя забрать неготовый заказ")
 export const ErrOrderAlreadyPickedUp = new DomainError("Нельзя дважды забрать один заказ")
 export const ErrNoOpenedOrder = new DomainError("У вас нету открытых заказов")
+export const ErrInvalidDiscount = new DomainError("Скидка не может быть больше суммы заказа")
 
 
 export const ORDER_STATUSES = ["progress", "issued", "pickedUp"] as const
@@ -23,6 +24,7 @@ export type OrderStatus = typeof ORDER_STATUSES[number]
 export type OrderItem = {
     productId: ID<Product>
     name: Name
+    category: Category
     selection: Record<ID<Option>, ID<Variant>>
     unitPrice: Price
     qty: Quantity
@@ -33,8 +35,9 @@ export type Order = {
     userId: ID<User>
     status: OrderStatus
     items: OrderItem[]
+    discount: Price
     total: Price
-    createdAt: string
+    createdAt: Time
     closed: boolean
 }
 
@@ -47,26 +50,31 @@ export function OrderItem(product: Product, cartItem: CartItem): OrderItem {
     return {
         productId: product.id,
         name: product.name,
+        category: product.category,
         selection: { ...cartItem.options },
         unitPrice: Product.calculateTotalPrice(product, cartItem.options),
         qty: cartItem.qty
     }
 }
 
-export function Order(user: User, items: OrderItem[]): Order {
+export function Order(user: User, items: OrderItem[], discount: Price): Order {
     if (items.length === 0) throw ErrEmptyOrder
+
+    const subtotal = items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0)
+
+    if (discount > subtotal) throw ErrInvalidDiscount
 
     return {
         id: ID.generate(),
         userId: user.id,
         status: "progress",
         items,
-        total: Price(items.reduce((sum, i) => sum + i.unitPrice * i.qty, 0)),
-        createdAt: new Date().toISOString(),
+        discount,
+        total: Price(subtotal - discount),
+        createdAt: Time.now(),
         closed: false
     }
 }
-
 
 
 export namespace Order {
@@ -101,9 +109,12 @@ export namespace Order {
         if (orderExists) throw ErrParallelOrders
     }
 
+    export function subtotal(order: Order) {
+        return order.total + order.discount
+    }
+
     export function optionsLabel(item: OrderItem, product: Product): string {
         const opts = Product.resolveSelection(product, item.selection)
         return opts.map(o => o.variant.name).join(", ")
     }
 }
-

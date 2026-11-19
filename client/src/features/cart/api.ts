@@ -1,9 +1,9 @@
 import { api } from "@/shared/api";
 import type { Product } from "domain/product";
 import type { CartItem } from "domain/user";
+import type { Cart } from "server/applications/usecases/queries/get-cart";
 import type { AddToCartRequest, RemoveFromCardRequest } from "server/presentation/cart";
 
-type Cart = [CartItem, Product][]
 
 export const cartApi = {
     getCart: () => api.get<Cart>('/me/cart'),

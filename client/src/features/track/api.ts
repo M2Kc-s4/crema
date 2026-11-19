@@ -1,11 +1,8 @@
 import { api } from "@/shared/api";
 import type { Order } from "domain/order";
 import type { Product } from "domain/product";
+import type { Track } from "server/applications/usecases/queries/get-track";
 
-type Track = {
-    order: Order
-    products: Product[]
-} | { order: null }
 
 export const trackApi = {
     getTrack: () => api.get<Track>('/track'),
